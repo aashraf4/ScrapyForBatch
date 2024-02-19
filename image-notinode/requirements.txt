@@ -1,0 +1,6 @@
+scrapy
+pandas
+pyarrow
+python-dotenv
+tls-client
+boto3

@@ -1,0 +1,5 @@
+scrapy
+pandas
+pyarrow
+python-dotenv
+boto3
