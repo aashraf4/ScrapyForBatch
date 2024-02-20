@@ -147,6 +147,16 @@ export class ScrapyForBatchStack extends cdk.Stack {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST // ON_DEMAND billing mode
     });
 
+    const lambdaFunction = new lambda.DockerImageFunction(this, 'InvokeFunction', {
+      functionName: 'ScrapyForBatchInvoke',
+      code: lambda.DockerImageCode.fromImageAsset('./lambdaInvoke'),
+      memorySize: 128,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        // Specify your environment variables here
+        job_queue_ARN: "arn:aws:batch:eu-central-1:608792983808:job-queue/ScrapyJobQueue-Ux430na75ridZ8e6",
+      },
+    });
 
   }
 }
