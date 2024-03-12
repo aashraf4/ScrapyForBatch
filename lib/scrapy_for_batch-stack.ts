@@ -7,6 +7,11 @@ import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import * as batch from 'aws-cdk-lib/aws-batch';
 import * as ecrdeploy from 'cdk-ecr-deployment';
+import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
+import * as sfn_tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
+
+import { generateASLDefinition } from './stateFunctionASL'; // Import the ASL definition generation function
+
 
 export class ScrapyForBatchStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -158,5 +163,20 @@ export class ScrapyForBatchStack extends cdk.Stack {
       },
     });
 
+    // Create a new state machine
+    // Generate the ASL definition using the provided function ARN
+    const aslDefinition = generateASLDefinition(lambdaFunction.functionArn);
+
+    
+    const cfnStateMachine = new sfn.CfnStateMachine(this, 'MyCfnStateMachine', {
+      roleArn: 'arn:aws:iam::608792983808:role/stepfunctionrole', // Replace with the IAM role ARN
+
+      // Optional properties
+      definition: aslDefinition,
+      stateMachineName: 'StepFuncBatchScr', // Replace with the desired state machine name
+      tracingConfiguration: {
+        enabled: true // Enable X-Ray tracing
+      }
+    });
   }
 }
