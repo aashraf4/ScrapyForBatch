@@ -1,4 +1,4 @@
-export function generateASLDefinition(LambdaFunctionArn: string): any {
+export function generateASLDefinition(LambdaFunctionArn: string, snsTopicArn: string): any {
 return{
   "Comment": "Scrapy code to run on AWS Batch",
   "StartAt": "Lambda with JSON",
@@ -96,7 +96,7 @@ return{
         "Message": {
           "status": "Batch Jobs Succeeded"
         },
-        "TopicArn": "arn:aws:sns:eu-central-1:608792983808:ScrapybatchexpStack-MySNSTopicF6FB035B-MwiII3oPUUuP"
+        "TopicArn": snsTopicArn
       },
       "End": true
     }

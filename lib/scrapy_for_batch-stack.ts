@@ -17,9 +17,9 @@ export class ScrapyForBatchStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const repo_ = new ecr.Repository(this, 'exprepoID', {
-      repositoryName: "scrapyforbatchrepo",
-    });
+    // const repo_ = new ecr.Repository(this, 'exprepoID', {
+    //   repositoryName: "scrapyforbatchrepo",
+    // });
     
     const image = new ecr_assets.DockerImageAsset(this, 'MatasImage', {
         directory: "./image-matas", // Path to Dockerfile
@@ -27,7 +27,7 @@ export class ScrapyForBatchStack extends cdk.Stack {
     
     new ecrdeploy.ECRDeployment(this, 'DeployDockerImage', {
       src: new ecrdeploy.DockerImageName(image.imageUri),
-      dest: new ecrdeploy.DockerImageName(`${repo_.repositoryUri}:matasscr`),
+      dest: new ecrdeploy.DockerImageName(`608792983808.dkr.ecr.eu-central-1.amazonaws.com/scrapyforbatchrepo:matasscr`),
     });
         
     const image2 = new ecr_assets.DockerImageAsset(this, 'NotinoDEImage', {
@@ -36,7 +36,7 @@ export class ScrapyForBatchStack extends cdk.Stack {
     
     new ecrdeploy.ECRDeployment(this, 'DeployDockerImage2', {
       src: new ecrdeploy.DockerImageName(image2.imageUri),
-      dest: new ecrdeploy.DockerImageName(`${repo_.repositoryUri}:notdescr`),
+      dest: new ecrdeploy.DockerImageName(`608792983808.dkr.ecr.eu-central-1.amazonaws.com/scrapyforbatchrepo:notdescr`),
     });
   
     const image3 = new ecr_assets.DockerImageAsset(this, 'SuperdrugImage', {
@@ -45,7 +45,7 @@ export class ScrapyForBatchStack extends cdk.Stack {
     
     new ecrdeploy.ECRDeployment(this, 'DeployDockerImage3', {
       src: new ecrdeploy.DockerImageName(image3.imageUri),
-      dest: new ecrdeploy.DockerImageName(`${repo_.repositoryUri}:superdrugscr`),
+      dest: new ecrdeploy.DockerImageName(`608792983808.dkr.ecr.eu-central-1.amazonaws.com/scrapyforbatchrepo:superdrugscr`),
     }); 
     
     const computeEnvironment = new batch.CfnComputeEnvironment(this, 'ScrapyComputeEnv', {
@@ -62,7 +62,7 @@ export class ScrapyForBatchStack extends cdk.Stack {
       jobDefinitionName: 'MatasJobDef',
       type: 'container', // Specify the type of job definition (container or multinode)
       containerProperties: {
-        image: `${repo_.repositoryUri.toString()}:matasscr`,
+        image: `608792983808.dkr.ecr.eu-central-1.amazonaws.com/scrapyforbatchrepo:matasscr`,
         resourceRequirements: [
           {
             type: 'MEMORY', // Specify memory requirement
@@ -87,7 +87,7 @@ export class ScrapyForBatchStack extends cdk.Stack {
       jobDefinitionName: 'NotinoDEJobDef',
       type: 'container', // Specify the type of job definition (container or multinode)
       containerProperties: {
-        image: `${repo_.repositoryUri.toString()}:notdescr`,
+        image: `608792983808.dkr.ecr.eu-central-1.amazonaws.com/scrapyforbatchrepo:notdescr`,
         resourceRequirements: [
           {
             type: 'MEMORY', // Specify memory requirement
@@ -111,7 +111,7 @@ export class ScrapyForBatchStack extends cdk.Stack {
       jobDefinitionName: 'SuperdrugJobDef',
       type: 'container', // Specify the type of job definition (container or multinode)
       containerProperties: {
-        image: `${repo_.repositoryUri.toString()}:superdrugscr`,
+        image: `608792983808.dkr.ecr.eu-central-1.amazonaws.com/scrapyforbatchrepo:superdrugscr`,
         resourceRequirements: [
           {
             type: 'MEMORY', // Specify memory requirement
@@ -132,15 +132,15 @@ export class ScrapyForBatchStack extends cdk.Stack {
     });
 
     // Define a job queue
-    // const jobQueue = new batch.CfnJobQueue(this, 'ScrapyJobQueue', {
-    //   priority: 1, // Specify the priority of the job queue
-    //   computeEnvironmentOrder: [
-    //     {
-    //       order: 1, // Specify the order of the compute environment
-    //       computeEnvironment: computeEnvironment.ref, // Reference to the compute environment
-    //     },
-    //   ],
-    // });
+    const jobQueue = new batch.CfnJobQueue(this, 'ScrapyJobQueue', {
+      priority: 1, // Specify the priority of the job queue
+      computeEnvironmentOrder: [
+        {
+          order: 1, // Specify the order of the compute environment
+          computeEnvironment: computeEnvironment.ref, // Reference to the compute environment
+        },
+      ],
+    });
     
     // Define a DynamoDB table with ON_DEMAND billing mode
     const table = new dynamodb.Table(this, 'MyDynamoDBTable', {
@@ -159,13 +159,20 @@ export class ScrapyForBatchStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
       environment: {
         // Specify your environment variables here
-        job_queue_ARN: "arn:aws:batch:eu-central-1:608792983808:job-queue/ScrapyJobQueue-Ux430na75ridZ8e6",
+        job_queue_ARN: jobQueue.ref,
+        matas_job_arn: jobDefinition.ref,
+        superdrug_job_arn: jobDefinition3.ref,
+        notino_job_arn: jobDefinition2.ref,        
       },
+    });
+    // Define the SNS topic
+    const topic = new sns.Topic(this, 'MySNSTopic', {
+      displayName: 'BatchScrapy' // Name the SNS Topic
     });
 
     // Create a new state machine
     // Generate the ASL definition using the provided function ARN
-    const aslDefinition = generateASLDefinition(lambdaFunction.functionArn);
+    const aslDefinition = generateASLDefinition(lambdaFunction.functionArn, topic.topicArn);
 
     
     const cfnStateMachine = new sfn.CfnStateMachine(this, 'MyCfnStateMachine', {

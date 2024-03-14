@@ -12,17 +12,17 @@ def handler(event, context):
         "BatchJobsList": [{
             "JobName": f"matas-{generate_datetime_string()}",
             "JobQueue": os.environ.get("job_queue_ARN"),
-            "JobDefinition": "arn:aws:batch:eu-central-1:608792983808:job-definition/MatasJobDef:1",
+            "JobDefinition": os.environ.get("matas_job_arn"),
         },
         {
             "JobName": f"notinode-{generate_datetime_string()}",
             "JobQueue": os.environ.get("job_queue_ARN"),
-            "JobDefinition": "arn:aws:batch:eu-central-1:608792983808:job-definition/NotinoDEJobDef:1",
+            "JobDefinition": os.environ.get("jobDefinition2"),
         },
         {
             "JobName": f"superdrug-{generate_datetime_string()}",
             "JobQueue": os.environ.get("job_queue_ARN"),
-            "JobDefinition": "arn:aws:batch:eu-central-1:608792983808:job-definition/SuperdrugJobDef:1",
+            "JobDefinition": os.environ.get("superdrug_job_arn"),
         }
     ]}
     
