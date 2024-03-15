@@ -57,7 +57,24 @@ class Notino(scrapy.Spider):
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
       'referer': None,
     }
-    
+   api_headers = {
+      'authority': 'www.notino.de',
+      'accept': 'application/json, text/plain, */*',
+      'accept-language': 'en-US,en;q=0.9,ar;q=0.8,en-AU;q=0.7,en-GB;q=0.6,it;q=0.5',
+      'cache-control': 'no-cache',
+      'content-type': 'application/json',
+      'cookie': 'ab80=1; grd=67207979090106332; npcount=1; db_ui=688a6e69-823d-5a0f-e025-e914a2dbe3d9; db_uicd=4540e27b-7616-a0e0-bf0f-b16602472421; __exponea_etc__=e0eb91a0-0b48-415d-a4c1-dd7fe63d4305; _bamls_usid=8704025a-e31a-4290-97c7-8426411de9c2; pppbnr=1; source=www.upwork.com; source45=www.upwork.com; lastProds=16090771-511673-16067216-16091217-16090566-16090380-16147298-16143900-16092821-16136656-15959161-16089261-16096621-16085134-16136223; lastSource=direct; USER=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaG9wIjoibm90aW5vLmRlIiwiY2dycCI6IjI1MCIsImxhbmciOiI1IiwibHRhZyI6ImRlLURFIiwiY3VyciI6IjEiLCJjYXJ0IjoiMEE1MTAwMDAtRjFFRC1BQTg1LUMxMjUtMDhEQUMyRjFCODZCIiwicm9sZSI6IkFub255bW91cyIsImdyZCI6IjY3MjA3OTc5MDkwMTA2MzMyIiwic2lkIjoiMEE1MTAwMDAtRjFFRC1BQTg1LUMxMEItMDhEQUMyRjFCODZCIiwiY2xpZW50Ijoid2ViIiwiaWF0IjoxNjcwMjYyMzg1LCJpc3MiOiJub3Rpbm8ifQ.K67YhhkWFAeTR9Lox6PsgOb7UDklYA-bnjsT797Blj0; lpv=aHR0cHM6Ly93d3cubm90aW5vLmRlLzNpbmEvP2Y9Mi0zLTcxMjAz; TS01c0a98c=016bdf2fdc1bafdadfc5e8f6c00567b055c1184e3d69952c813f6d725c685ed388dbc705b29c3c1564b22caf6670083fdfb69b7e7aacefae9aa7f82e05229995493c493073; TS0178d2ea=016bdf2fdc93a13ab01453b20ce6c9507bc77a417269952c813f6d725c685ed388dbc705b225a73f599b5e9544e99bc3e2aaf6124c0891ee15f45920f0b83aa50cd71d025bdae7b17d725f5c874a126a14ed52e6a416cfccba8289190cd860f69b39fcf3a0c5a69da8f4e46bdb5fc1d4bdb92ddf742c09d85c8eb06050a1358a08605c7ba4; __exponea_time2__=-0.33794140815734863; TS8ffb2f78027=08a5d12542ab2000533924848106d348d488fdcc789dfa3785d58bf6683079de3c4e4fb619d2eb050817304e45113000050db1815ce30dbeb8bb2874b891370897faa9b1708013bd38072653ed2b9f49bd614928a032c75f14842c6f0f5da9c0; USER=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaG9wIjoibm90aW5vLmRlIiwiY2dycCI6IjI1MCIsImxhbmciOiI1IiwibHRhZyI6ImRlLURFIiwiY3VyciI6IjEiLCJjYXJ0IjoiMEE1MTAwMDAtRjFFRC1BQTg1LUMxMjUtMDhEQUMyRjFCODZCIiwicm9sZSI6IkFub255bW91cyIsImdyZCI6IjY3MjA3OTc5MDkwMTA2MzMyIiwic2lkIjoiMEE1MTAwMDAtRjFFRC1BQTg1LUMxMEItMDhEQUMyRjFCODZCIiwiY2xpZW50Ijoid2ViIiwiaWF0IjoxNjY4MDcyNzk0LCJpc3MiOiJub3Rpbm8ifQ.v_dKADqzrTFOG0lyozQY_Lf9GQiTs2zU-rm5IjWhyu8',
+      'origin': 'https://www.notino.de',
+      'pragma': 'no-cache',
+      'referer': None,
+      'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"Windows"',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-site': 'same-origin',
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
+    }
    custom_settings = {
     "CONCURRENT_REQUESTS_PER_DOMAIN": 1,
      "DOWNLOAD_DELAY": 2,
@@ -72,34 +89,13 @@ class Notino(scrapy.Spider):
       'REQUEST_FINGERPRINTER_IMPLEMENTATION': "2.7",
       'LOG_FILE': logs_name,
    }
-    
+
    final_created = False
    products_list_created = False
 
    def start_requests(self):
       yield scrapy.Request(url=self.starting_url, headers=self.headers, callback=self.parse_brands)
-    
-   def api_headers(self):
-        api_headers = {
-          'authority': 'www.notino.de',
-          'accept': 'application/json, text/plain, */*',
-          'accept-language': 'en-US,en;q=0.9,ar;q=0.8,en-AU;q=0.7,en-GB;q=0.6,it;q=0.5',
-          'cache-control': 'no-cache',
-          'content-type': 'application/json',
-          'cookie': 'ab80=1; grd=67207979090106332; npcount=1; db_ui=688a6e69-823d-5a0f-e025-e914a2dbe3d9; db_uicd=4540e27b-7616-a0e0-bf0f-b16602472421; __exponea_etc__=e0eb91a0-0b48-415d-a4c1-dd7fe63d4305; _bamls_usid=8704025a-e31a-4290-97c7-8426411de9c2; pppbnr=1; source=www.upwork.com; source45=www.upwork.com; lastProds=16090771-511673-16067216-16091217-16090566-16090380-16147298-16143900-16092821-16136656-15959161-16089261-16096621-16085134-16136223; lastSource=direct; USER=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaG9wIjoibm90aW5vLmRlIiwiY2dycCI6IjI1MCIsImxhbmciOiI1IiwibHRhZyI6ImRlLURFIiwiY3VyciI6IjEiLCJjYXJ0IjoiMEE1MTAwMDAtRjFFRC1BQTg1LUMxMjUtMDhEQUMyRjFCODZCIiwicm9sZSI6IkFub255bW91cyIsImdyZCI6IjY3MjA3OTc5MDkwMTA2MzMyIiwic2lkIjoiMEE1MTAwMDAtRjFFRC1BQTg1LUMxMEItMDhEQUMyRjFCODZCIiwiY2xpZW50Ijoid2ViIiwiaWF0IjoxNjcwMjYyMzg1LCJpc3MiOiJub3Rpbm8ifQ.K67YhhkWFAeTR9Lox6PsgOb7UDklYA-bnjsT797Blj0; lpv=aHR0cHM6Ly93d3cubm90aW5vLmRlLzNpbmEvP2Y9Mi0zLTcxMjAz; TS01c0a98c=016bdf2fdc1bafdadfc5e8f6c00567b055c1184e3d69952c813f6d725c685ed388dbc705b29c3c1564b22caf6670083fdfb69b7e7aacefae9aa7f82e05229995493c493073; TS0178d2ea=016bdf2fdc93a13ab01453b20ce6c9507bc77a417269952c813f6d725c685ed388dbc705b225a73f599b5e9544e99bc3e2aaf6124c0891ee15f45920f0b83aa50cd71d025bdae7b17d725f5c874a126a14ed52e6a416cfccba8289190cd860f69b39fcf3a0c5a69da8f4e46bdb5fc1d4bdb92ddf742c09d85c8eb06050a1358a08605c7ba4; __exponea_time2__=-0.33794140815734863; TS8ffb2f78027=08a5d12542ab2000533924848106d348d488fdcc789dfa3785d58bf6683079de3c4e4fb619d2eb050817304e45113000050db1815ce30dbeb8bb2874b891370897faa9b1708013bd38072653ed2b9f49bd614928a032c75f14842c6f0f5da9c0; USER=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaG9wIjoibm90aW5vLmRlIiwiY2dycCI6IjI1MCIsImxhbmciOiI1IiwibHRhZyI6ImRlLURFIiwiY3VyciI6IjEiLCJjYXJ0IjoiMEE1MTAwMDAtRjFFRC1BQTg1LUMxMjUtMDhEQUMyRjFCODZCIiwicm9sZSI6IkFub255bW91cyIsImdyZCI6IjY3MjA3OTc5MDkwMTA2MzMyIiwic2lkIjoiMEE1MTAwMDAtRjFFRC1BQTg1LUMxMEItMDhEQUMyRjFCODZCIiwiY2xpZW50Ijoid2ViIiwiaWF0IjoxNjY4MDcyNzk0LCJpc3MiOiJub3Rpbm8ifQ.v_dKADqzrTFOG0lyozQY_Lf9GQiTs2zU-rm5IjWhyu8',
-          'origin': 'https://www.notino.de',
-          'pragma': 'no-cache',
-          'referer': None,
-          'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
-          'sec-ch-ua-mobile': '?0',
-          'sec-ch-ua-platform': '"Windows"',
-          'sec-fetch-dest': 'empty',
-          'sec-fetch-mode': 'cors',
-          'sec-fetch-site': 'same-origin',
-          'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
-        }
 
-        return api_headers
       
    def parse_brands(self, response):
       links = response.css("div.crossroad-brands ul.reset li a")
@@ -120,7 +116,7 @@ class Notino(scrapy.Spider):
         
         body = f'{{"urlPart":"{href}","pageSize":24,"filterString":"{page}","include":{{"filtration":false,"breadcrumbs":false,"navigationTree":false,"searchCategories":false,"listing":true,"specialPageData":false}}}}'
         url = "https://www.notino.de/api/navigation/navigation/notino.de"
-        yield scrapy.Request(url=url, headers=self.api_headers(), method='POST', 
+        yield scrapy.Request(url=url, headers=self.api_headers, method='POST', 
                             meta={"href": str(href), "cat_number": str(cat_number)},
                             callback=self.parse_brands_api,
                             body=body
@@ -146,7 +142,7 @@ class Notino(scrapy.Spider):
         #     body = f'{{"urlPart":"{href}","pageSize":24,"filterString":"{page}","include":{{"filtration":false,"breadcrumbs":false,"navigationTree":false,"searchCategories":false,"listing":true,"specialPageData":false}}}}'
 
         #     url = "https://www.notino.de/api/navigation/navigation/notino.de"
-        #     yield scrapy.Request(url=url, headers=self.api_headers(), method='POST', body=body, 
+        #     yield scrapy.Request(url=url, headers=self.api_headers, method='POST', body=body, 
         #                          callback=self.parse_brands_api,
         #                          meta={"href": href, "cat_number": cat_number})
        

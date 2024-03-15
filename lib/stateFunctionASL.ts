@@ -48,9 +48,9 @@ return{
                 "ErrorEquals": [
                   "States.TaskFailed"
                 ],
-                "Next": "Failure Update"
+                "Next": "Failure Update",
               }
-            ]
+            ],
           },
           "Sucess Update": {
             "Type": "Task",

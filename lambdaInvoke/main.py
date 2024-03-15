@@ -17,7 +17,7 @@ def handler(event, context):
         {
             "JobName": f"notinode-{generate_datetime_string()}",
             "JobQueue": os.environ.get("job_queue_ARN"),
-            "JobDefinition": os.environ.get("jobDefinition2"),
+            "JobDefinition": os.environ.get("notino_job_arn"),
         },
         {
             "JobName": f"superdrug-{generate_datetime_string()}",
