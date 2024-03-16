@@ -1,14 +1,35 @@
-# Welcome to your CDK TypeScript project
+## AWS CDK Scrapy For Batch Stack
 
-This is a blank project for CDK development with TypeScript.
+**Purpose:**
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+* Automates deployment of a batch processing pipeline for concurrent Scrapy spider jobs.
 
-## Useful commands
+**Components:**
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+* Uses AWS services like Batch, DynamoDB, Lambda, SNS, ECR, and Step Functions. 
+
+**Features:**
+
+* Deploy Scrapy spiders using Docker containers with AWS Batch.
+* Dynamically scale resources based on workload with AWS Fargate.
+* Manage job execution with a customizable AWS Batch job queue.
+* Store job data in DynamoDB for tracking.
+* Send notifications upon job completion/failure via Amazon SNS.
+* Utilize serverless orchestration with AWS Step Functions.
+
+**How it Works:**
+
+1. **DynamoDB Table:** Stores job metadata and status.
+2. **Batch Job Definitions:** Define job specifications for Scrapy spiders.
+3. **Batch Job Queue:** Manages execution order of spider jobs.
+4. **Lambda Functions:** Initiate batch jobs and handle notifications.
+5. **SNS Topic:** Sends notifications to subscribed endpoints.
+6. **Step Functions State Machine:** Orchestrates the job workflow.
+
+**Deployment:**
+
+1. Make sure to have an ECR repository exists and is referenced in ./lib
+2. Make sure to have an S3 repository exists and is referenced in the images to be deployed to ECR
+3. Deploy the stack using `cdk deploy`.
+**Additional Notes:**
+* Ensure proper IAM roles and permissions for secure access to resources.
