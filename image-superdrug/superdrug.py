@@ -10,7 +10,8 @@ from dotenv import load_dotenv
 import os
 import boto3
 
-load_dotenv()
+parent_directory = os.path.dirname(os.getcwd())
+load_dotenv(parent_directory)
 
 aws_key = os.getenv("aws_key")
 aws_secret = os.getenv("aws_secret")

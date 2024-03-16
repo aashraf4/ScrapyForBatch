@@ -170,6 +170,19 @@ export class ScrapyForBatchStack extends cdk.Stack {
       displayName: 'BatchScrapy' // Name the SNS Topic
     });
 
+
+
+    const snsLambdaFunction = new lambda.DockerImageFunction(this, 'SnsFunction', {
+      functionName: 'ScrapyForBatchSNS',
+      code: lambda.DockerImageCode.fromImageAsset('./lambda-send-sns'),
+      memorySize: 128,
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        // Specify your environment variables here
+        sns_ARN: topic.topicArn,
+        ddb_ARN: table.tableName,
+      },
+    });
     // Create a new state machine
     // Generate the ASL definition using the provided function ARN
     const aslDefinition = generateASLDefinition(lambdaFunction.functionArn, topic.topicArn);
