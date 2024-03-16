@@ -9,6 +9,8 @@ import * as batch from 'aws-cdk-lib/aws-batch';
 import * as ecrdeploy from 'cdk-ecr-deployment';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as sfn_tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
+import * as snsSubscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 import { generateASLDefinition } from './stateFunctionASL'; // Import the ASL definition generation function
 
@@ -169,7 +171,7 @@ export class ScrapyForBatchStack extends cdk.Stack {
     const topic = new sns.Topic(this, 'MySNSTopic', {
       displayName: 'BatchScrapy' // Name the SNS Topic
     });
-
+    topic.addSubscription(new snsSubscriptions.EmailSubscription('aashrafw4@gmail.com'));
 
 
     const snsLambdaFunction = new lambda.DockerImageFunction(this, 'SnsFunction', {
@@ -183,9 +185,21 @@ export class ScrapyForBatchStack extends cdk.Stack {
         ddb_ARN: table.tableName,
       },
     });
+
+    // Add permissions to access DynamoDB
+    table.grantReadData(snsLambdaFunction);
+
+    // Add permissions to publish to SNS topic
+    topic.grantPublish(snsLambdaFunction);
+
+    // Optionally, you can grant additional permissions as needed
+    snsLambdaFunction.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['sns:ListSubscriptionsByTopic'],
+      resources: [topic.topicArn]
+    }));
     // Create a new state machine
     // Generate the ASL definition using the provided function ARN
-    const aslDefinition = generateASLDefinition(lambdaFunction.functionArn, topic.topicArn);
+    const aslDefinition = generateASLDefinition(table.tableName, lambdaFunction.functionArn, snsLambdaFunction.functionArn);
 
     
     const cfnStateMachine = new sfn.CfnStateMachine(this, 'MyCfnStateMachine', {

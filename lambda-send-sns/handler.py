@@ -1,9 +1,14 @@
 import os
 import boto3
 from dotenv import load_dotenv
+from datetime import datetime
 
 parent_directory = os.path.dirname(os.getcwd())
 load_dotenv(parent_directory)
+
+today = datetime.today()
+date = today.strftime("%Y-%m-%d")
+output_date = today.strftime("%Y%m%d")
 
 def lambda_handler(event, context):
     # Retrieve AWS credentials from environment variables
@@ -25,7 +30,10 @@ def lambda_handler(event, context):
     table = dynamodb.Table(table_name)
 
     # Retrieve data from the DynamoDB table
-    response = table.scan()
+    response = table.scan(
+        FilterExpression="contains(job_name, :output_date)",
+        ExpressionAttributeValues={":output_date": output_date}
+    )
     
     # Process retrieved items
     statuses = []
