@@ -33,3 +33,7 @@
 3. Deploy the stack using `cdk deploy`.
 **Additional Notes:**
 * Ensure proper IAM roles and permissions for secure access to resources.
+* 
+![Chart](https://i.imgur.com/Lx0gO01.png)
+![State function](https://i.imgur.com/AMGOhjw.jpeg)
+
