@@ -10,8 +10,8 @@ from dotenv import load_dotenv
 import os
 import boto3
 
-parent_directory = os.path.dirname(os.getcwd())
-load_dotenv(parent_directory)
+#parent_directory = os.path.dirname(os.getcwd())
+load_dotenv()
 
 aws_key = os.getenv("aws_key")
 aws_secret = os.getenv("aws_secret")
@@ -353,8 +353,8 @@ if __name__ == '__main__':
         print(f"There was an error running the script for {retailer_locale_name}: ", e)
     finally:
         current_dir = os.getcwd()
-        details_path = f"{current_dir}/product_list_table_{retailer_locale_name}_{output_date}.parquet"
-        list_path = f"{current_dir}/product_details_table_{retailer_locale_name}_{output_date}.parquet"
+        details_path = f"{current_dir}/product_details_table_{retailer_locale_name}_{output_date}.parquet"
+        list_path = f"{current_dir}/product_list_table_{retailer_locale_name}_{output_date}.parquet"
         
         try:
             upload_to_s3(details_path, f"{retailer_locale_name}/details_{output_date}.parquet")
