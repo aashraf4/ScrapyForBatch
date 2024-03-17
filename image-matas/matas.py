@@ -268,36 +268,39 @@ if __name__ == '__main__':
         process = CrawlerProcess()
         process.crawl(Matas)
         process.start()
+
         details_table = pd.read_csv(f"product_details_table_{retailer_locale_name}_{output_date}.csv", 
                             encoding='utf-8-sig', na_filter = False)
         details_table = details_table.sort_values(by=['product_name'])
-        details_table.to_csv(f"product_details_table_{retailer_locale_name}_{output_date}.csv", 
-                                              encoding='utf-8-sig', mode='w', index=False)
-        
+        details_table.to_parquet(f"product_details_table_{retailer_locale_name}_{output_date}.parquet", engine='auto', 
+                                    compression='snappy',
+                                    index=False)
         
         list_table = details_table.drop_duplicates(subset='product_url', keep="first")
         list_table = list_table[['retailer_locale', 'retailer_locale_name',
                         'Brand Name', 'product_name', 'product_url',
                         'scrape_date']].rename({'Brand Name': 'brand_name'}, axis=1)
                         
-        list_table.to_csv(f"product_list_table_{retailer_locale_name}_{output_date}.csv", 
-                     encoding='utf-8-sig', index=False)
+        list_table.to_parquet(f"product_list_table_{retailer_locale_name}_{output_date}.parquet", engine='auto', 
+                                    compression='snappy',
+                                    index=False)
                 
     except Exception as e:
         print(f"There was an error running the script for {retailer_locale_name}: ", e)
     finally:
         current_dir = os.getcwd()
-        details_path = f"{current_dir}/product_list_table_{retailer_locale_name}_{output_date}.csv"
-        list_path = f"{current_dir}/product_details_table_{retailer_locale_name}_{output_date}.csv"
-        logs_path = f"{current_dir}/{logs_name}"
+        details_path = f"{current_dir}/product_list_table_{retailer_locale_name}_{output_date}.parquet"
+        list_path = f"{current_dir}/product_details_table_{retailer_locale_name}_{output_date}.parquet"
+        
         try:
-            upload_to_s3(details_path, f"{retailer_locale_name}/details_{output_date}.csv")
-            upload_to_s3(list_path, f"{retailer_locale_name}/list_{output_date}.csv")
-            upload_to_s3(logs_path, f"{retailer_locale_name}/{logs_name}")
+            upload_to_s3(details_path, f"{retailer_locale_name}/details_{output_date}.parquet")
+            upload_to_s3(list_path, f"{retailer_locale_name}/list_{output_date}.parquet")
         except:
             pass
         finally:
             os.remove(details_path)
+            os.remove(details_path.replace(".parquet", ".csv"))
             os.remove(list_path)
-            os.remove(logs_name)
-            
+    logs_path = f"{current_dir}/{logs_name}"
+    upload_to_s3(logs_path, f"{retailer_locale_name}/{logs_name}")
+    os.remove(logs_name)
