@@ -4,7 +4,7 @@ import os
 
 def generate_datetime_string():
     # Get the current date and time down to the minute
-    current_datetime = datetime.utcnow().strftime("%Y%m%d-%H%M")
+    current_datetime = datetime.utcnow().strftime("%Y%m%d")
     return current_datetime
 
 def handler(event, context):
