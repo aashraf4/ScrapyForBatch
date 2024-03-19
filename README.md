@@ -24,16 +24,17 @@
 3. **Batch Job Queue:** Manages execution order of spider jobs.
 4. **Lambda Functions:** Initiate batch jobs and handle notifications.
 5. **SNS Topic:** Sends notifications to subscribed endpoints.
-6. **Step Functions State Machine:** Orchestrates the job workflow.
+6. **Glue Crawler:** Crawl the S3 bucket to keep data updated and readily available for viewing in Athena.
+7. **Step Functions State Machine:** Orchestrates the job workflow.
 
 **Deployment:**
 
 1. Make sure to have an ECR repository exists and is referenced in ./lib
 2. Make sure to have an S3 repository exists and is referenced in the images to be deployed to ECR
-3. Deploy the stack using `cdk deploy`.
+3. Make sure to have an AWS Glue DB correctly configured
+4. Deploy the stack using `cdk deploy`.
 **Additional Notes:**
 * Ensure proper IAM roles and permissions for secure access to resources.
-* 
-![Chart](https://i.imgur.com/Lx0gO01.png)
-![State function](https://i.imgur.com/AMGOhjw.jpeg)
+![Chart](https://i.imgur.com/3ZKAP7d.png)
+![State function](https://i.imgur.com/JNM9uD6.jpeg)
 
