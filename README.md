@@ -6,7 +6,7 @@
 
 **Components:**
 
-* Uses AWS services like Batch, DynamoDB, Lambda, SNS, ECR, and Step Functions. 
+* Uses AWS services like Batch, DynamoDB, Lambda, SNS, ECR, Glue, and Step Functions. 
 
 **Features:**
 
@@ -36,5 +36,5 @@
 **Additional Notes:**
 * Ensure proper IAM roles and permissions for secure access to resources.
 ![Chart](https://i.imgur.com/3ZKAP7d.png)
-![State function](https://i.imgur.com/JNM9uD6.jpeg)
+![State function](https://i.imgur.com/3jgdbif.png)
 
