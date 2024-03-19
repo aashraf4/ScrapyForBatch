@@ -129,7 +129,7 @@ class Notino(scrapy.Spider):
         cat_number = response.meta.get("cat_number")
         
 
-        for p in json_response['listing']['products'][0:3]:
+        for p in json_response['listing']['products']:
             url = self.base_url + p['url']
             yield scrapy.Request(url=url, headers=self.headers, callback=self.parse_details, )
                                 
@@ -459,8 +459,8 @@ if __name__ == '__main__':
         list_path = f"{current_dir}/product_list_table_{retailer_locale_name}_{output_date}.parquet"
         
         try:
-            upload_to_s3(details_path, f"{retailer_locale_name}/details_{output_date}.parquet")
-            upload_to_s3(list_path, f"{retailer_locale_name}/list_{output_date}.parquet")
+            upload_to_s3(details_path, f"details/{retailer_locale_name}-{output_date}/details_{retailer_locale_name}_{output_date}.parquet")
+            upload_to_s3(list_path, f"list/{retailer_locale_name}-{output_date}/list_{retailer_locale_name}_{output_date}.parquet")
         except:
             pass
         finally:
@@ -468,5 +468,5 @@ if __name__ == '__main__':
             os.remove(details_path.replace(".parquet", ".csv"))
             os.remove(list_path)
     logs_path = f"{current_dir}/{logs_name}"
-    upload_to_s3(logs_path, f"{retailer_locale_name}/{logs_name}")
+    upload_to_s3(logs_path, f"logs/{retailer_locale_name}-{output_date}/{logs_name}")
     os.remove(logs_name)
