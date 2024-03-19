@@ -1,4 +1,4 @@
-export function generateASLDefinition(DDBName: string, LambdaInvokeARN: string, LambdaSNSARN: string): any {
+export function generateASLDefinition(DDBName: string, LambdaInvokeARN: string, LambdaSNSARN: string, crawlerName: string): any {
 return{
   "Comment": "Scrapy code to run on AWS Batch",
   "StartAt": "Lambda with JSON",
@@ -20,7 +20,7 @@ return{
                   "S.$": "$.JobName"
                 }
               },
-              "TableName": "ScrapyForBatchDDB"
+              "TableName": DDBName,
             },
             "Resource": "arn:aws:states:::dynamodb:putItem",
             "Type": "Task"
@@ -32,7 +32,6 @@ return{
                   "States.TaskFailed"
                 ],
                 "Next": "Failure Update",
-                //"ResultPath": null
               }
             ],
             "Next": "Sucess Update",
@@ -55,7 +54,7 @@ return{
                   "S.$": "$.JobName"
                 }
               },
-              "TableName": DDBName,
+              "TableName": "ScrapyForBatchDDB"
             },
             "Resource": "arn:aws:states:::dynamodb:putItem",
             "Type": "Task"
@@ -63,19 +62,19 @@ return{
         }
       },
       "MaxConcurrency": 3,
-      "Type": "Map",
-      "Next": "Lambda Invoke"
+      "Next": "Lambda Invoke",
+      "Type": "Map"
     },
     "Lambda Invoke": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "Payload.$": "$",
         "FunctionName": LambdaSNSARN,
+        "Payload.$": "$"
       },
+      "Resource": "arn:aws:states:::lambda:invoke",
       "Retry": [
         {
+          "BackoffRate": 2,
           "ErrorEquals": [
             "Lambda.ServiceException",
             "Lambda.AWSLambdaException",
@@ -83,11 +82,19 @@ return{
             "Lambda.TooManyRequestsException"
           ],
           "IntervalSeconds": 1,
-          "MaxAttempts": 3,
-          "BackoffRate": 2
+          "MaxAttempts": 3
         }
       ],
-      "End": true
+      "Type": "Task",
+      "Next": "StartCrawler"
+    },
+    "StartCrawler": {
+      "Type": "Task",
+      "End": true,
+      "Parameters": {
+        "Name": crawlerName,
+      },
+      "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler"
     },
     "Lambda with JSON": {
       "Next": "Fan out batch jobs",

@@ -11,6 +11,7 @@ import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as sfn_tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import * as snsSubscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as glue from 'aws-cdk-lib/aws-glue';
 
 import { generateASLDefinition } from './stateFunctionASL'; // Import the ASL definition generation function
 
@@ -197,9 +198,27 @@ export class ScrapyForBatchStack extends cdk.Stack {
       actions: ['sns:ListSubscriptionsByTopic'],
       resources: [topic.topicArn]
     }));
+
+    // Define Glue Crawler
+    const crawlerName = "srapybatchcrawler"
+    const crawler = new glue.CfnCrawler(this, crawlerName, {
+        databaseName: 'batschscrdb', // Pass the database name to the crawler
+        role: 'arn:aws:iam::608792983808:role/glue-s3-role', // Specify the ARN of the IAM role that Glue should use
+        targets: {
+            s3Targets: [
+                {
+                    path: 's3://bucketbatchtest/details' // Specify the S3 path that the crawler should crawl
+                }
+            ]
+        },
+        name: crawlerName,
+    });
+    
+    
     // Create a new state machine
     // Generate the ASL definition using the provided function ARN
-    const aslDefinition = generateASLDefinition(table.tableName, lambdaFunction.functionArn, snsLambdaFunction.functionArn);
+    const aslDefinition = generateASLDefinition(table.tableName, lambdaFunction.functionArn, 
+                                                snsLambdaFunction.functionArn, crawlerName);
 
     
     const cfnStateMachine = new sfn.CfnStateMachine(this, 'MyCfnStateMachine', {
